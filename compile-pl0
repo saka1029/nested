@@ -1,3 +1,0 @@
-#!/bin/bash
-
-fpc -Miso src/main/pascal/pl0/pl0.pas

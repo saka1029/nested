@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR=src/main/pascal/pl0
+pushd $DIR
+fpc -Miso pl0.pas
+./pl0 < sample.pl0 > sample.out
+popd

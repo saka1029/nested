@@ -1,6 +1,7 @@
 package saka1029.nested;
 
 import java.util.Map;
+
 import static java.util.Map.*;
 
 public class Nested {
@@ -13,12 +14,12 @@ public class Nested {
         VAR, END, PROCEDURE, FUNCTION, IF, THEN, ELSE, WHILE, RETURN,
         INT, ID, EOF;
     }
+
     static final Map<String, Token> RESERVED = Map.ofEntries(
         entry("var", Token.VAR), entry("end", Token.END),
         entry("procedure", Token.PROCEDURE), entry("function", Token.FUNCTION),
         entry("if", Token.IF), entry("then", Token.THEN), entry("else", Token.ELSE),
-        entry("while", Token.WHILE),
-        entry("return", Token.RETURN)
+        entry("while", Token.WHILE), entry("return", Token.RETURN)
     );
 
     final int[] input;

@@ -4,6 +4,9 @@ import java.util.Map;
 
 import static java.util.Map.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Nested {
 
     public enum Token {
@@ -11,16 +14,22 @@ public class Nested {
         PLUS, MINUS, STAR, SLASH,
         ASSIGN, EQ, NE, GT, GE, LT, LE,
         AND, OR,
-        VAR, END, PROCEDURE, FUNCTION, IF, THEN, ELSE, WHILE, RETURN,
+        PROGRAM, VAR, END, PROCEDURE, FUNCTION,
+        IF, THEN, ELSE, WHILE, RETURN,
         INT, ID, EOF;
     }
 
     static final Map<String, Token> RESERVED = Map.ofEntries(
+        entry("program", Token.PROGRAM),
         entry("var", Token.VAR), entry("end", Token.END),
         entry("procedure", Token.PROCEDURE), entry("function", Token.FUNCTION),
         entry("if", Token.IF), entry("then", Token.THEN), entry("else", Token.ELSE),
         entry("while", Token.WHILE), entry("return", Token.RETURN)
     );
+
+    static class Instruction {
+
+    }
 
     final int[] input;
     int index = 0, ch;
@@ -95,7 +104,6 @@ public class Nested {
 
     public Token token() {
         spaces();
-        int start = index - 1;
         switch (ch) {
             case -1: return Token.EOF;
             case '(': return token(Token.LP);
@@ -122,6 +130,57 @@ public class Nested {
         }
     }
 
+    public Token eaten;
+    public String eatenString;
+
+    boolean eat(Token... expects) {
+        for (Token expected : expects)
+            if (token == expected) {
+                eaten = token;
+                eatenString = string;
+                token();
+                return true;
+            }
+        return false;
+    }
+
+    List<Instruction> codes = new ArrayList<>();
+
+    RuntimeException error(String format, Object... args) {
+        return new RuntimeException(format.formatted(args));
+    }
+
+    void vars() {
+
+    }
+
+    void routines() {
+
+    }
+
+    void statements() {
+
+    }
+
+    void program() {
+        token();
+        if (!eat(Token.PROGRAM))
+            throw error("'program' expected");
+        if (eat(Token.VAR))
+            vars();
+        if (eat(Token.PROCEDURE, Token.FUNCTION))
+            routines();
+        statements();
+        if (!eat(Token.END))
+            throw error("'end' expected");
+
+    }
+
+    public static List<Instruction> parse(String input) {
+        Nested nested = new Nested(input);
+        nested.program();
+        return nested.codes;
+    }
 
 
 }

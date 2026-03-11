@@ -1,9 +1,11 @@
 # Syntax
 
 ```
-program    = 'program' [ vars ] { routines } statements 'end'
-vars       = 'var' id { ',' id } ';'
-routines   = ( 'procedure' | 'function' ) id '(' [ id { ',' id } ] ')' [ vars ] statements 'end'
+program    = 'program' [ vars ] [ routines ] statements 'end'
+vars       = 'var' var { ',' var } ';'
+var        = id [ '=' expression ]
+routines   = routine { ';' routine } [ ';' ]
+routine    = ( 'procedure' | 'function' ) id '(' [ id { ',' id } ] ')' [ vars ] statements 'end'
 statements = statement { ';' statement } [ ';' ]
 statement  = id '=' expression
            | id '(' [ expresion { ',' expresion } ] ')'

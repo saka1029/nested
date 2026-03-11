@@ -1,3 +1,4 @@
 #!/bin/bash
 
 fpc -Cn src/main/pascal/variable.pas 
+fpc -Cn src/main/pascal/procedure.pas 

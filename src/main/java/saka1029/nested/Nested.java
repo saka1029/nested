@@ -74,6 +74,25 @@ public class Nested {
         return single;
     }
 
+    Token id() {
+        int start = index - 1;
+        do {
+            ch();
+        } while (isIdRest(ch));
+        string = new String(input, start, index - start - 1);
+        Token token = RESERVED.get(string);
+        return token == null ? Token.ID : token;
+    }
+
+    Token number() {
+        int start = index - 1;
+        do {
+            ch();
+        } while (isDigit(ch));
+        string = new String(input, start, index - start - 1);
+        return Token.INT;
+    }
+
     public Token token() {
         spaces();
         int start = index - 1;
@@ -94,20 +113,11 @@ public class Nested {
             case '&': return token('&', Token.AND);
             case '|': return token('|', Token.OR);
             default:
-                if (isIdFirst(ch)) {
-                    do {
-                        ch();
-                    } while (isIdRest(ch));
-                    string = new String(input, start, index - start - 1);
-                    Token token = RESERVED.get(string);
-                    return token == null ? Token.ID : token;
-                } else if (isDigit(ch)) {
-                    do {
-                        ch();
-                    } while (isDigit(ch));
-                    string = new String(input, start, index - start - 1);
-                    return Token.INT;
-                } else
+                if (isIdFirst(ch))
+                    return id();
+                else if (isDigit(ch))
+                    return number();
+                else
                     throw new RuntimeException("Unknown char '%c'".formatted((char)ch));
         }
     }

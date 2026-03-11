@@ -1,4 +1,4 @@
-package saka1029.nested;
+package test.saka1029.nested;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

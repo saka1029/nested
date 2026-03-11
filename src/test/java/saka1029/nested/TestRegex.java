@@ -13,6 +13,7 @@ public class TestRegex {
     public void testB() {
         Pattern word = Pattern.compile("^if\\b");
         assertTrue(word.matcher("if ").find());
+        assertTrue(word.matcher("if").find());
         assertTrue(word.matcher("if-").find());
         assertFalse(word.matcher("iff").find());
         assertFalse(word.matcher("if3").find());

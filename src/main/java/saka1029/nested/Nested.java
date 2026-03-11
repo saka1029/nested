@@ -194,8 +194,16 @@ public class Nested {
 
     void statement() {
         if (eat(Token.ID)) {
-            expect(Token.ASSIGN);
-            expression();
+            if (eat(Token.ASSIGN)) {
+                expression();
+            } else if (eat(Token.LP)) {
+                if (!eat(Token.RP)) {
+                    expression();
+                    while (eat(Token.COMMA))
+                        expression();
+                }
+                expect(Token.RP);
+            }
         } else if (eat(Token.IF)) {
             expression();
             expect(Token.THEN);

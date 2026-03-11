@@ -162,8 +162,40 @@ public class Nested {
         return new RuntimeException(format.formatted(args));
     }
 
+    void factor() {
+        if (eat(Token.LP)) {
+            expression();
+            expect(Token.RP);
+        } else if (eat(Token.ID)) {
+            ;
+        } else if (eat(Token.INT)) {
+            ;
+        } else
+            throw error("Unknown token '%s'", token);
+    }
+
+    void term() {
+        factor();
+        while (true) {
+            if (eat(Token.STAR))
+                factor();
+            else if (eat(Token.SLASH))
+                factor();
+            else
+                break;
+        }
+    }
+
     void expression() {
-        expect(Token.INT);
+        term();
+        while (true) {
+            if (eat(Token.PLUS))
+                term();
+            else if (eat(Token.MINUS))
+                term();
+            else
+                break;
+        }
     }
 
     void var() {

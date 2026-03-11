@@ -15,7 +15,7 @@ public class Nested {
         ASSIGN, EQ, NE, GT, GE, LT, LE,
         AND, OR,
         PROGRAM, VAR, END, PROCEDURE, FUNCTION,
-        IF, THEN, ELSE, WHILE, RETURN,
+        IF, THEN, ELSE, WHILE, DO, RETURN,
         INT, ID, EOF;
 
         @Override
@@ -29,7 +29,8 @@ public class Nested {
         entry("var", Token.VAR), entry("end", Token.END),
         entry("procedure", Token.PROCEDURE), entry("function", Token.FUNCTION),
         entry("if", Token.IF), entry("then", Token.THEN), entry("else", Token.ELSE),
-        entry("while", Token.WHILE), entry("return", Token.RETURN)
+        entry("while", Token.WHILE), entry("do", Token.DO),
+        entry("return", Token.RETURN)
     );
 
     public static class Instruction {
@@ -192,9 +193,23 @@ public class Nested {
     }
 
     void statement() {
-        expect(Token.ID);
-        expect(Token.ASSIGN);
-        expression();
+        if (eat(Token.ID)) {
+            expect(Token.ASSIGN);
+            expression();
+        } else if (eat(Token.IF)) {
+            expression();
+            expect(Token.THEN);
+            statements();
+            if (eat(Token.ELSE))
+                statements();
+            expect(Token.END);
+        } else if (eat(Token.WHILE)){
+            expression();
+            expect(Token.DO);
+            statements();
+            expect(Token.END);
+        } else
+            throw error("Unknown token '%s'", token);
     }
 
     void statements() {

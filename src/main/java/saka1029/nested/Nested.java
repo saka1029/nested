@@ -17,6 +17,11 @@ public class Nested {
         PROGRAM, VAR, END, PROCEDURE, FUNCTION,
         IF, THEN, ELSE, WHILE, RETURN,
         INT, ID, EOF;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 
     static final Map<String, Token> RESERVED = Map.ofEntries(
@@ -27,7 +32,7 @@ public class Nested {
         entry("while", Token.WHILE), entry("return", Token.RETURN)
     );
 
-    static class Instruction {
+    public static class Instruction {
 
     }
 
@@ -67,7 +72,7 @@ public class Nested {
 
     Token token(Token token) {
         ch();
-        return token;
+        return this.token = token;
     }
 
     Token token(int second, Token token) {
@@ -80,7 +85,7 @@ public class Nested {
     Token token(Token single, int second, Token token) {
         if (ch() == second)
             return token(token);
-        return single;
+        return this.token = single;
     }
 
     Token id() {
@@ -89,8 +94,8 @@ public class Nested {
             ch();
         } while (isIdRest(ch));
         string = new String(input, start, index - start - 1);
-        Token token = RESERVED.get(string);
-        return token == null ? Token.ID : token;
+        Token found = RESERVED.get(string);
+        return token = found == null ? Token.ID : found;
     }
 
     Token number() {
@@ -99,7 +104,7 @@ public class Nested {
             ch();
         } while (isDigit(ch));
         string = new String(input, start, index - start - 1);
-        return Token.INT;
+        return token = Token.INT;
     }
 
     public Token token() {
@@ -144,36 +149,71 @@ public class Nested {
         return false;
     }
 
+    void expect(Token expected) {
+        if (token != expected)
+            throw error("'%s' expected", expected);
+        token();
+    }
+
     List<Instruction> codes = new ArrayList<>();
 
     RuntimeException error(String format, Object... args) {
         return new RuntimeException(format.formatted(args));
     }
 
-    void vars() {
+    void expression() {
+        expect(Token.INT);
+    }
 
+    void var() {
+        expect(Token.ID);
+        if (eat(Token.ASSIGN))
+            expression();
+    }
+
+    void vars() {
+        var();
+        while (eat(Token.COMMA))
+            var();
+        expect(Token.SEMI);
     }
 
     void routines() {
+        expect(Token.ID);
+        expect(Token.LP);
+        if (eat(Token.ID))
+            while (eat(Token.COMMA))
+                expect(Token.ID);
+        expect(Token.RP);
+        if (eat(Token.VAR))
+            vars();
+        statements();
+        expect(Token.END);
+    }
 
+    void statement() {
+        expect(Token.ID);
+        expect(Token.ASSIGN);
+        expression();
     }
 
     void statements() {
-
+        statement();
+        while (eat(Token.SEMI))
+            statement();
+        if (eat(Token.SEMI))
+            ;
     }
 
     void program() {
         token();
-        if (!eat(Token.PROGRAM))
-            throw error("'program' expected");
+        expect(Token.PROGRAM);
         if (eat(Token.VAR))
             vars();
         if (eat(Token.PROCEDURE, Token.FUNCTION))
             routines();
         statements();
-        if (!eat(Token.END))
-            throw error("'end' expected");
-
+        expect(Token.END);
     }
 
     public static List<Instruction> parse(String input) {
@@ -181,6 +221,5 @@ public class Nested {
         nested.program();
         return nested.codes;
     }
-
 
 }

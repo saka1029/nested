@@ -2,9 +2,12 @@ package test.saka1029.nested;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.junit.Test;
 
 import saka1029.nested.Nested;
+import saka1029.nested.Nested.Instruction;
 import saka1029.nested.Nested.Token;
 
 public class TestNested {
@@ -53,5 +56,12 @@ public class TestNested {
         } catch (RuntimeException e) {
             assertEquals("Unknown '|x'", e.getMessage());
         }
+    }
+
+    @Test
+    public void testParse() {
+        List<Instruction> code = Nested.parse(
+            "program var x =3; procedure f(y) x=2 end x=5 end");
+
     }
 }

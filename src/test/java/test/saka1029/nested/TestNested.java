@@ -11,14 +11,47 @@ public class TestNested {
 
     @Test
     public void testToken() {
-        Nested scanner = new Nested("  if (abc3漢字 == 123)  return");
+        Nested scanner = new Nested("  if (abc3漢字 != 123)  return");
         assertEquals(Token.IF, scanner.token());
         assertEquals(Token.LP, scanner.token());
         assertEquals(Token.ID, scanner.token()); assertEquals("abc3漢字", scanner.string);
-        assertEquals(Token.EQ, scanner.token());
+        assertEquals(Token.NE, scanner.token());
         assertEquals(Token.INT, scanner.token()); assertEquals("123", scanner.string);
         assertEquals(Token.RP, scanner.token());
         assertEquals(Token.RETURN, scanner.token());
         assertEquals(Token.EOF, scanner.token());
+    }
+
+    @Test
+    public void testNE() {
+        Nested scanner = new Nested("  != !A");
+        assertEquals(Token.NE, scanner.token());
+        try {
+            scanner.token();
+        } catch (RuntimeException e) {
+            assertEquals("Unknown '!A'", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAND() {
+        Nested scanner = new Nested("  && & ");
+        assertEquals(Token.AND, scanner.token());
+        try {
+            scanner.token();
+        } catch (RuntimeException e) {
+            assertEquals("Unknown '& '", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOR() {
+        Nested scanner = new Nested("  || |x ");
+        assertEquals(Token.OR, scanner.token());
+        try {
+            scanner.token();
+        } catch (RuntimeException e) {
+            assertEquals("Unknown '|x'", e.getMessage());
+        }
     }
 }

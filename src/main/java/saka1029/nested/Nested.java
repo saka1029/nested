@@ -6,10 +6,10 @@ import static java.util.Map.*;
 public class Nested {
 
     public enum Token {
-        LP, RP, COMMA,
+        LP, RP, COMMA, SEMI,
         PLUS, MINUS, STAR, SLASH,
         ASSIGN, EQ, NE, GT, GE, LT, LE,
-        SEMI,
+        AND, OR,
         VAR, END, PROCEDURE, FUNCTION, IF, THEN, ELSE, WHILE, RETURN,
         INT, ID, EOF;
     }
@@ -38,11 +38,6 @@ public class Nested {
         return ch = -1;
     }
 
-    Token token(Token token) {
-        ch();
-        return token;
-    }
-
     void spaces() {
         while (Character.isWhitespace(ch))
             ch();
@@ -60,6 +55,24 @@ public class Nested {
         return isIdFirst(ch) || Character.isDigit(ch) || ch == '_';
     }
 
+    Token token(Token token) {
+        ch();
+        return token;
+    }
+
+    Token token(int second, Token token) {
+        int first = ch;
+        if (ch() == second)
+            return token(token);
+        throw new RuntimeException("Unknown '%c%c'".formatted(first, ch));
+    }
+
+    Token token(Token single, int second, Token token) {
+        if (ch() == second)
+            return token(token);
+        return single;
+    }
+
     public Token token() {
         spaces();
         int start = index - 1;
@@ -73,21 +86,24 @@ public class Nested {
             case '-': return token(Token.MINUS);
             case '*': return token(Token.STAR);
             case '/': return token(Token.SLASH);
-            case '=': return ch() == '=' ? token(Token.EQ) : Token.ASSIGN;
-            case '<': return ch() == '=' ? token(Token.LE) : Token.LT;
-            case '>': return ch() == '=' ? token(Token.GE) : Token.GT;
+            case '=': return token(Token.ASSIGN, '=', Token.EQ);
+            case '<': return token(Token.LT, '=', Token.LE);
+            case '>': return token(Token.GT, '=', Token.GE);
+            case '!': return token('=', Token.NE);
+            case '&': return token('&', Token.AND);
+            case '|': return token('|', Token.OR);
             default:
                 if (isIdFirst(ch)) {
-                    ch();
-                    while (isIdRest(ch))
+                    do {
                         ch();
+                    } while (isIdRest(ch));
                     string = new String(input, start, index - start - 1);
                     Token token = RESERVED.get(string);
                     return token == null ? Token.ID : token;
                 } else if (isDigit(ch)) {
-                    ch();
-                    while (isDigit(ch))
+                    do {
                         ch();
+                    } while (isDigit(ch));
                     string = new String(input, start, index - start - 1);
                     return Token.INT;
                 } else

@@ -4,12 +4,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>pl0</groupId>
-  <artifactId>pl0</artifactId>
+  <groupId>nested</groupId>
+  <artifactId>nested</artifactId>
   <version>1.0</version>
 
   <name>pl0</name>
-  <url>https://github.com/saka1029/pl0.git</url>
+  <url>https://github.com/saka1029/nested.git</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

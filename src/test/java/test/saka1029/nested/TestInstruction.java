@@ -12,27 +12,31 @@ public class TestInstruction {
     @Test
     public void testADD() {
         Context context = new Context();
+        context.codes.add(Instruction.ADD);
         context.push(2);
         context.push(3);
         assertEquals(2, context.sp);
         assertEquals(2, context.stack[0]);
         assertEquals(3, context.stack[1]);
-        Instruction.ADD.execute(context);
+        context.run();
         assertEquals(1, context.sp);
         assertEquals(5, context.stack[0]);
+        assertEquals(1, context.pc);
     }
 
     @Test
     public void testSUBTRACT() {
         Context context = new Context();
+        context.codes.add(Instruction.SUBTRACT);
         context.push(2);
         context.push(3);
         assertEquals(2, context.sp);
         assertEquals(2, context.stack[0]);
         assertEquals(3, context.stack[1]);
-        Instruction.SUBTRACT.execute(context);
+        context.run();
         assertEquals(1, context.sp);
         assertEquals(-1, context.stack[0]);
+        assertEquals(1, context.pc);
     }
 
 }

@@ -69,7 +69,7 @@ public class TestNested {
                 x = x + 3;
             end
             """);
-        assertEquals(10, context.codes.size());
+        assertEquals(11, context.codes.size());
         List<Instruction> expectedCodes = List.of(
             Instruction.literal(3),
             Instruction.literal(5),
@@ -80,7 +80,8 @@ public class TestNested {
             Instruction.load(0),
             Instruction.literal(3),
             Instruction.ADD,
-            Instruction.store(0));
+            Instruction.store(0),
+            Instruction.NOP);
         assertEquals(expectedCodes, context.codes);
     }
 

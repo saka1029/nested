@@ -302,7 +302,6 @@ public class Nested {
             must(Token.END);
             if (!elseExists)
                 codes.set(thenPos, Instruction.branchFalse(codes.size()));
-            codes.add(Instruction.NOP);
         } else if (eat(Token.WHILE)){
             expression();
             must(Token.DO);
@@ -327,6 +326,7 @@ public class Nested {
         //     routines();
         statements();
         must(Token.END);
+        codes.add(Instruction.NOP);
     }
 
     public static Context parse(String input) {

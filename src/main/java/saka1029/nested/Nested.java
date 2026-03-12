@@ -202,6 +202,8 @@ public class Nested {
     }
 
     void expression() {
+        if (eat(Token.PLUS, Token.MINUS))
+            ;
         term();
         while (true) {
             if (eat(Token.PLUS))

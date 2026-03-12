@@ -64,7 +64,7 @@ public class TestNested {
             """
             program
             var x = 3, y = 5;
-            procedure f(a, b, c) x = 2 + a end
+            procedure f(a, b, c) x = -2 + a end
             y = 5 * x
             """);
         assertEquals(0, code.size());

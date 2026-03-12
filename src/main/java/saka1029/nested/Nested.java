@@ -41,10 +41,6 @@ public class Nested {
         entry("return", Token.RETURN)
     );
 
-    public static class Instruction {
-
-    }
-
     final int[] input;
     int index = 0, ch;
 

@@ -292,8 +292,8 @@ public class Nested {
         must(Token.PROGRAM);
         if (eat(Token.VAR))
             vars();
-        if (eat(Token.PROCEDURE, Token.FUNCTION))
-            routines();
+        // if (eat(Token.PROCEDURE, Token.FUNCTION))
+        //     routines();
         statements();
         must(Token.END);
     }

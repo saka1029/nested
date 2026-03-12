@@ -61,7 +61,7 @@ public class TestNested {
 
     @Test
     public void testParse() {
-        List<Instruction> codes = Nested.parse(
+        Context context = Nested.parse(
             """
             program
                 var x = 3, y = 5;
@@ -69,7 +69,7 @@ public class TestNested {
                 x = x + 3;
             end
             """);
-        assertEquals(10, codes.size());
+        assertEquals(10, context.codes.size());
         List<Instruction> expectedCodes = List.of(
             Instruction.literal(3),
             Instruction.literal(5),
@@ -81,7 +81,7 @@ public class TestNested {
             Instruction.literal(3),
             Instruction.ADD,
             Instruction.store(0));
-        assertEquals(expectedCodes, codes);
+        assertEquals(expectedCodes, context.codes);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class TestNested {
                 x = x + 3;
             end
             """;
-        Context context = new Context(Nested.parse(source));
+        Context context = Nested.parse(source);
         context.run();
         assertEquals(2, context.sp);
         // var x

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import saka1029.nested.Context;
 import saka1029.nested.Instruction;
 import saka1029.nested.Nested;
 import saka1029.nested.Nested.Token;
@@ -81,5 +82,23 @@ public class TestNested {
             Instruction.ADD,
             Instruction.store(0));
         assertEquals(expectedCodes, codes);
+    }
+
+    @Test
+    public void testRun() {
+        String source = """
+            program
+                var x = 3, y = 5;
+                y = 5 * x;
+                x = x + 3;
+            end
+            """;
+        Context context = new Context(Nested.parse(source));
+        context.run();
+        assertEquals(2, context.sp);
+        // var x
+        assertEquals(6, context.stack[0]);
+        // var y
+        assertEquals(15, context.stack[1]);
     }
 }

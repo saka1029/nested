@@ -263,51 +263,68 @@ public class Nested {
         must(Token.END);
     }
 
-    void statement() {
-        if (eat(Token.ID)) {
-            String name = eatenString;
-            if (eat(Token.ASSIGN)) {
-                expression();
-                Integer addr = variables.get(name);
-                if (addr == null)
-                    throw error("Variable '%s' not defined", name);
-                codes.add(Instruction.store(addr));
-            } else if (eat(Token.LP)) {
-                if (!eat(Token.RP)) {
-                    expression();
-                    while (eat(Token.COMMA))
-                        expression();
-                }
-                must(Token.RP);
-            }
-        } else if (eat(Token.IF)) {
-            // if expression then  statements else    statements   end
-            //               BF X;            B Y; X:           Y:
-            // if expression then  statements                      end
-            //               BF X;                               X:
-            expression();
-            must(Token.THEN);
-            int thenPos = codes.size();
-            codes.add(Instruction.branchFalse(-1));
+    /**
+     * if expression then  statements else    statements   end
+     *               BF X;            B Y; X:            Y:
+     * if expression then  statements                      end
+     *               BF X;                               X:
+     */
+    void ifStatement() {
+        expression();
+        must(Token.THEN);
+        int thenPos = codes.size();
+        codes.add(Instruction.branchFalse(-1));
+        statements();
+        boolean elseExists = false;
+        if (eat(Token.ELSE)) {
+            elseExists = true;
+            int elsePos = codes.size();
+            codes.add(Instruction.branch(-1));
+            codes.set(thenPos, Instruction.branchFalse(codes.size()));
             statements();
-            boolean elseExists = false;
-            if (eat(Token.ELSE)) {
-                elseExists = true;
-                int elsePos = codes.size();
-                codes.add(Instruction.branch(-1));
-                codes.set(thenPos, Instruction.branchFalse(codes.size()));
-                statements();
-                codes.set(elsePos, Instruction.branch(codes.size()));
-            }
-            must(Token.END);
-            if (!elseExists)
-                codes.set(thenPos, Instruction.branchFalse(codes.size()));
-        } else if (eat(Token.WHILE)){
-            expression();
-            must(Token.DO);
-            statements();
-            must(Token.END);
+            codes.set(elsePos, Instruction.branch(codes.size()));
         }
+        must(Token.END);
+        if (!elseExists)
+            codes.set(thenPos, Instruction.branchFalse(codes.size()));
+    }
+
+    /**
+     * while expression  do    statements  end
+     * X:                BF Y              B X  Y:
+     */
+    void whileStatement() {
+        expression();
+        must(Token.DO);
+        statements();
+        must(Token.END);
+    }
+
+    void assignOrCallStatement() {
+        String name = eatenString;
+        if (eat(Token.ASSIGN)) {
+            expression();
+            Integer addr = variables.get(name);
+            if (addr == null)
+                throw error("Variable '%s' not defined", name);
+            codes.add(Instruction.store(addr));
+        } else if (eat(Token.LP)) {
+            if (!eat(Token.RP)) {
+                expression();
+                while (eat(Token.COMMA))
+                    expression();
+            }
+            must(Token.RP);
+        }
+    }
+
+    void statement() {
+        if (eat(Token.ID))
+            assignOrCallStatement();
+        else if (eat(Token.IF))
+            ifStatement();
+        else if (eat(Token.WHILE))
+            whileStatement();
     }
 
     void statements() {

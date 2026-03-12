@@ -235,6 +235,8 @@ public class Nested {
             expression();
         else
             codes.add(Instruction.literal(0));
+        if (variables.containsKey(name))
+            throw error("Variale '%s' duplicated", name);
         variables.put(name, variables.size());
     }
 

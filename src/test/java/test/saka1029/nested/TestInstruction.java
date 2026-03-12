@@ -21,6 +21,35 @@ public class TestInstruction {
     }
 
     @Test
+    public void testLoad() {
+        Context context = new Context();
+        context.codes.add(Instruction.load(0));
+        context.push(22);   // address = 0
+        assertEquals(1, context.sp);
+        assertEquals(22, context.stack[0]);
+        context.run();
+        assertEquals(2, context.sp);
+        assertEquals(22, context.stack[0]);
+        assertEquals(22, context.stack[1]);
+        assertEquals(1, context.pc);
+    }
+
+    @Test
+    public void testStore() {
+        Context context = new Context();
+        context.codes.add(Instruction.store(0));
+        context.push(22);   // address = 0
+        context.push(77);
+        assertEquals(2, context.sp);
+        assertEquals(22, context.stack[0]);
+        assertEquals(77, context.stack[1]);
+        context.run();
+        assertEquals(1, context.sp);
+        assertEquals(77, context.stack[0]);
+        assertEquals(1, context.pc);
+    }
+
+    @Test
     public void testADD() {
         Context context = new Context();
         context.codes.add(Instruction.ADD);

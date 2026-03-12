@@ -18,4 +18,8 @@ public class Context {
         stack[sp++] = v;
     }
 
+    public int pop() {
+        return stack[--sp];
+    }
+
 }

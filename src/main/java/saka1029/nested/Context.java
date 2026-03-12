@@ -1,7 +1,9 @@
 package saka1029.nested;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Context {
 
@@ -9,13 +11,15 @@ public class Context {
     public int sp = 0;
     public int pc = 0;
     public final List<Instruction> codes;
+    public final Map<String, Integer> variables;
 
-    public Context(List<Instruction> codes) {
+    public Context(List<Instruction> codes, Map<String, Integer> variables) {
         this.codes = codes;
+        this.variables = variables;
     }
 
     public Context() {
-        this(new ArrayList<>());
+        this(new ArrayList<>(), new LinkedHashMap<>());
     }
 
     public void run() {
@@ -27,6 +31,10 @@ public class Context {
                 break;
             instruction.execute(this);
         }
+    }
+
+    public int get(String variable) {
+        return stack[variables.get(variable)];
     }
 
     public void push(int v) {

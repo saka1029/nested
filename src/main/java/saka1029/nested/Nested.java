@@ -316,7 +316,7 @@ public class Nested {
     public static Context parse(String input) {
         Nested nested = new Nested(input);
         nested.program();
-        return new Context(nested.codes);
+        return new Context(nested.codes, nested.variables);
     }
 
 }

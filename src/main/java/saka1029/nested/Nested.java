@@ -12,7 +12,7 @@ public class Nested {
     public enum Token {
         LP("("), RP(")"), COMMA(","), SEMICOLON(";"),
         PLUS("+"), MINUS("-"), STAR("*"), SLASH("/"),
-        ASSIGN("="), EQ("=="), NE("!="),
+        ASSIGN("="), EQ("=="), NOT("!"), NE("!="),
         GT(">"), GE(">="), LT("<"), LE("<="),
         AND("&&"), OR("||"),
         PROGRAM("program"), VAR("var"), END("end"),
@@ -135,7 +135,7 @@ public class Nested {
             case '=': return token(Token.ASSIGN, '=', Token.EQ);
             case '<': return token(Token.LT, '=', Token.LE);
             case '>': return token(Token.GT, '=', Token.GE);
-            case '!': return token('=', Token.NE);
+            case '!': return token(Token.NOT, '=', Token.NE);
             case '&': return token('&', Token.AND);
             case '|': return token('|', Token.OR);
             default:

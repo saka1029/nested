@@ -79,4 +79,49 @@ public class TestInstruction {
         assertEquals(1, context.pc);
     }
 
+    @Test
+    public void testDIVIDE() {
+        Context context = new Context();
+        context.codes.add(Instruction.DIVIDE);
+        context.push(18);
+        context.push(3);
+        assertEquals(2, context.sp);
+        assertEquals(18, context.stack[0]);
+        assertEquals(3, context.stack[1]);
+        context.run();
+        assertEquals(1, context.sp);
+        assertEquals(6, context.stack[0]);
+        assertEquals(1, context.pc);
+    }
+
+    @Test
+    public void testLT() {
+        Context context = new Context();
+        context.codes.add(Instruction.LT);
+        context.push(18);
+        context.push(3);
+        assertEquals(2, context.sp);
+        assertEquals(18, context.stack[0]);
+        assertEquals(3, context.stack[1]);
+        context.run();
+        assertEquals(1, context.sp);
+        assertEquals(0, context.stack[0]);
+        assertEquals(1, context.pc);
+    }
+
+    @Test
+    public void testLT2() {
+        Context context = new Context();
+        context.codes.add(Instruction.LT);
+        context.push(1);
+        context.push(3);
+        assertEquals(2, context.sp);
+        assertEquals(1, context.stack[0]);
+        assertEquals(3, context.stack[1]);
+        context.run();
+        assertEquals(1, context.sp);
+        assertEquals(1, context.stack[0]);
+        assertEquals(1, context.pc);
+    }
+
 }

@@ -86,7 +86,7 @@ public class TestNested {
     }
 
     @Test
-    public void testIfElse() {
+    public void testIfThenElse() {
         Context context = Nested.parse(
             """
             program
@@ -112,6 +112,30 @@ public class TestNested {
         assertEquals(expectedCodes, context.codes);
         context.run();
         assertEquals(5, context.get("x"));
+    }
+
+    @Test
+    public void testIfThen() {
+        Context context = Nested.parse(
+            """
+            program
+                var x = 2;
+                if 1 then
+                    x = 0
+                end
+            end
+            """);
+        assertEquals(6, context.codes.size());
+        List<Instruction> expectedCodes = List.of(
+            Instruction.literal(2),
+            Instruction.literal(1),
+            Instruction.branchFalse(5),
+            Instruction.literal(0),
+            Instruction.store(0),
+            Instruction.NOP);
+        assertEquals(expectedCodes, context.codes);
+        context.run();
+        assertEquals(0, context.get("x"));
     }
 
     @Test

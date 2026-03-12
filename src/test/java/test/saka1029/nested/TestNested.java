@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.junit.Test;
 
+import saka1029.nested.Instruction;
 import saka1029.nested.Nested;
-import saka1029.nested.Nested.Instruction;
 import saka1029.nested.Nested.Token;
 
 public class TestNested {

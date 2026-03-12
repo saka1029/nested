@@ -37,6 +37,9 @@ public class Context {
         return stack[variables.get(variable)];
     }
 
+    public void nop() {
+    }
+
     public void push(int v) {
         stack[sp++] = v;
     }

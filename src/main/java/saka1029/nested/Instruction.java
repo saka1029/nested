@@ -4,6 +4,7 @@ public interface Instruction {
 
     void execute(Context context);
 
+    public static final Instruction NOP = c -> c.nop();
     public static final Instruction ADD = c -> c.push(c.pop() + c.pop());
     public static final Instruction SUBTRACT = c -> c.push(-c.pop() + c.pop());
     public static final Instruction MULTIPLY = c -> c.push(c.pop() * c.pop());
@@ -45,4 +46,16 @@ public interface Instruction {
         @Override public void execute(Context context) { context.stack[value] = context.pop(); }
     }
     public static Instruction store(int address) { return new Store(address); }
+
+    static class Branch extends InstAbs {
+        Branch(int value) { super(value); }
+        @Override public void execute(Context context) { context.pc = value; }
+    }
+    public static Instruction branch(int address) { return new Branch(address); }
+
+    static class BranchFalse extends InstAbs {
+        BranchFalse(int value) { super(value); }
+        @Override public void execute(Context context) { if (context.pop() == 0) context.pc = value; }
+    }
+    public static Instruction branchFalse(int address) { return new BranchFalse(address); }
 }

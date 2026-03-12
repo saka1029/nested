@@ -85,6 +85,35 @@ public class TestNested {
     }
 
     @Test
+    public void testIfElse() {
+        Context context = Nested.parse(
+            """
+            program
+                var x = 2;
+                if 0 then
+                    x = 0
+                else
+                    x = 5
+                end
+            end
+            """);
+        assertEquals(9, context.codes.size());
+        List<Instruction> expectedCodes = List.of(
+            Instruction.literal(2),
+            Instruction.literal(0),
+            Instruction.branchFalse(6),
+            Instruction.literal(0),
+            Instruction.store(0),
+            Instruction.branch(8),
+            Instruction.literal(5),
+            Instruction.store(0),
+            Instruction.NOP);
+        assertEquals(expectedCodes, context.codes);
+        context.run();
+        assertEquals(5, context.get("x"));
+    }
+
+    @Test
     public void testRun() {
         String source = """
             program

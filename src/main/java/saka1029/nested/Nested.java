@@ -281,12 +281,28 @@ public class Nested {
                 must(Token.RP);
             }
         } else if (eat(Token.IF)) {
+            // if expression then  statements else    statements   end
+            //               BF X;            B Y; X:           Y:
+            // if expression then  statements                      end
+            //               BF X;                               X:
             expression();
             must(Token.THEN);
+            int thenPos = codes.size();
+            codes.add(Instruction.branchFalse(-1));
             statements();
-            if (eat(Token.ELSE))
+            boolean elseExists = false;
+            if (eat(Token.ELSE)) {
+                elseExists = true;
+                int elsePos = codes.size();
+                codes.add(Instruction.branch(-1));
+                codes.set(thenPos, Instruction.branchFalse(codes.size()));
                 statements();
+                codes.set(elsePos, Instruction.branch(codes.size()));
+            }
             must(Token.END);
+            if (!elseExists)
+                codes.set(thenPos, Instruction.branchFalse(codes.size()));
+            codes.add(Instruction.NOP);
         } else if (eat(Token.WHILE)){
             expression();
             must(Token.DO);

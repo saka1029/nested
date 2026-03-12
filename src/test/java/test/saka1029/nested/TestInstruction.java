@@ -10,6 +10,17 @@ import saka1029.nested.Instruction;
 public class TestInstruction {
 
     @Test
+    public void testLiteral() {
+        Context context = new Context();
+        context.codes.add(Instruction.literal(10));
+        assertEquals(0, context.sp);
+        context.run();
+        assertEquals(1, context.sp);
+        assertEquals(10, context.stack[0]);
+        assertEquals(1, context.pc);
+    }
+
+    @Test
     public void testADD() {
         Context context = new Context();
         context.codes.add(Instruction.ADD);

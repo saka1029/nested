@@ -47,8 +47,16 @@ public class Nested {
 
     final int[] input;
     int index = 0, ch;
+
+    // token()で読み込んだ後のTokenとToken文字列
+    // tokenStringはtokenがIDまたはINTのときのみ値が保証される。
     public Token token;
-    public String string;
+    public String tokenString;
+
+    // eatまたはmustにマッチしたあとのTokenとToken文字列
+    // eatenStringはeatenがIDまたはINTのときのみ値が保証される。
+    public Token eaten;
+    public String eatenString;
 
     public Nested(String input) {
         this.input = input.codePoints().toArray();
@@ -102,8 +110,8 @@ public class Nested {
         do {
             ch();
         } while (isIdRest(ch));
-        string = new String(input, start, index - start - 1);
-        Token found = RESERVED.get(string);
+        tokenString = new String(input, start, index - start - 1);
+        Token found = RESERVED.get(tokenString);
         return token = found == null ? Token.ID : found;
     }
 
@@ -112,7 +120,7 @@ public class Nested {
         do {
             ch();
         } while (isDigit(ch));
-        string = new String(input, start, index - start - 1);
+        tokenString = new String(input, start, index - start - 1);
         return token = Token.INT;
     }
 
@@ -144,23 +152,22 @@ public class Nested {
         }
     }
 
-    public Token eaten;
-    public String eatenString;
-
     boolean eat(Token... expects) {
         for (Token expected : expects)
             if (token == expected) {
                 eaten = token;
-                eatenString = string;
+                eatenString = tokenString;
                 token();
                 return true;
             }
         return false;
     }
 
-    void expect(Token expected) {
+    void must(Token expected) {
         if (token != expected)
             throw error("'%s' expected", expected);
+        eaten = token;
+        eatenString = tokenString;
         token();
     }
 
@@ -173,7 +180,7 @@ public class Nested {
     void factor() {
         if (eat(Token.LP)) {
             expression();
-            expect(Token.RP);
+            must(Token.RP);
         } else if (eat(Token.ID)) {
             ;
         } else if (eat(Token.INT)) {
@@ -207,7 +214,9 @@ public class Nested {
     }
 
     void var() {
-        expect(Token.ID);
+        // Token.VARがeatされた状態
+        must(Token.ID);
+        System.out.printf("var %s%n", eatenString);
         if (eat(Token.ASSIGN))
             expression();
     }
@@ -216,21 +225,30 @@ public class Nested {
         var();
         while (eat(Token.COMMA))
             var();
-        expect(Token.SEMICOLON);
+        must(Token.SEMICOLON);
     }
 
     void routines() {
-        System.out.printf("%s %s%n", eatenString, string);
-        expect(Token.ID);
-        expect(Token.LP);
-        if (eat(Token.ID))
-            while (eat(Token.COMMA))
-                expect(Token.ID);
-        expect(Token.RP);
+        // procedureまたはfunctionがeatされている
+        Token t = eaten;
+        must(Token.ID);
+        // IDがeatされている
+        System.out.printf("%s %s%n", t, eatenString);
+        must(Token.LP);
+        if (eat(Token.ID)) {
+            // IDがeatされている
+            System.out.printf("arg %s%n", eatenString);
+            while (eat(Token.COMMA)) {
+                must(Token.ID);
+                // IDがeatされている
+                System.out.printf("arg %s%n", eatenString);
+            }
+        }
+        must(Token.RP);
         if (eat(Token.VAR))
             vars();
         statements();
-        expect(Token.END);
+        must(Token.END);
     }
 
     void statement() {
@@ -243,20 +261,20 @@ public class Nested {
                     while (eat(Token.COMMA))
                         expression();
                 }
-                expect(Token.RP);
+                must(Token.RP);
             }
         } else if (eat(Token.IF)) {
             expression();
-            expect(Token.THEN);
+            must(Token.THEN);
             statements();
             if (eat(Token.ELSE))
                 statements();
-            expect(Token.END);
+            must(Token.END);
         } else if (eat(Token.WHILE)){
             expression();
-            expect(Token.DO);
+            must(Token.DO);
             statements();
-            expect(Token.END);
+            must(Token.END);
         } else
             throw error("Unknown token '%s'", token);
     }
@@ -271,7 +289,7 @@ public class Nested {
 
     void program() {
         token();
-        expect(Token.PROGRAM);
+        must(Token.PROGRAM);
         if (eat(Token.VAR))
             vars();
         if (eat(Token.PROCEDURE, Token.FUNCTION))

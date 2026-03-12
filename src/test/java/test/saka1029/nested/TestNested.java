@@ -17,9 +17,9 @@ public class TestNested {
         Nested scanner = new Nested("  if (abc3漢字 != 123)  return");
         assertEquals(Token.IF, scanner.token());
         assertEquals(Token.LP, scanner.token());
-        assertEquals(Token.ID, scanner.token()); assertEquals("abc3漢字", scanner.string);
+        assertEquals(Token.ID, scanner.token()); assertEquals("abc3漢字", scanner.tokenString);
         assertEquals(Token.NE, scanner.token());
-        assertEquals(Token.INT, scanner.token()); assertEquals("123", scanner.string);
+        assertEquals(Token.INT, scanner.token()); assertEquals("123", scanner.tokenString);
         assertEquals(Token.RP, scanner.token());
         assertEquals(Token.RETURN, scanner.token());
         assertEquals(Token.EOF, scanner.token());
@@ -64,7 +64,7 @@ public class TestNested {
             """
             program
             var x = 3, y = 5;
-            procedure f(a) x = 2 + a end
+            procedure f(a, b, c) x = 2 + a end
             y = 5 * x
             """);
         assertEquals(0, code.size());

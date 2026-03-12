@@ -277,16 +277,14 @@ public class Nested {
             must(Token.DO);
             statements();
             must(Token.END);
-        } else
-            throw error("Unknown token '%s'", token);
+        }
     }
 
     void statements() {
         statement();
         while (eat(Token.SEMICOLON))
             statement();
-        if (eat(Token.SEMICOLON))
-            ;
+        eat(Token.SEMICOLON);
     }
 
     void program() {

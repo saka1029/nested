@@ -67,7 +67,8 @@ public class TestNested {
                 procedure f(a, b, c)
                     x = -2 + a
                 end
-                y = 5 * x
+                y = 5 * x;
+                x = x + 3;
             end
             """);
         assertEquals(0, code.size());

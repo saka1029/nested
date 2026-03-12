@@ -10,13 +10,21 @@ import java.util.List;
 public class Nested {
 
     public enum Token {
-        LP, RP, COMMA, SEMI,
-        PLUS, MINUS, STAR, SLASH,
-        ASSIGN, EQ, NE, GT, GE, LT, LE,
-        AND, OR,
-        PROGRAM, VAR, END, PROCEDURE, FUNCTION,
-        IF, THEN, ELSE, WHILE, DO, RETURN,
-        INT, ID, EOF;
+        LP("("), RP(")"), COMMA(","), SEMICOLON(";"),
+        PLUS("+"), MINUS("-"), STAR("*"), SLASH("/"),
+        ASSIGN("="), EQ("=="), NE("!="),
+        GT(">"), GE(">="), LT("<"), LE("<="),
+        AND("&&"), OR("||"),
+        PROGRAM("program"), VAR("var"), END("end"),
+        PROCEDURE("procedure"), FUNCTION("function"),
+        IF("if"), THEN("then"), ELSE("else"),
+        WHILE("while"), DO("do"), RETURN("return"),
+        INT("INTEGER"), ID("IDENTifier"), EOF("EOF");
+
+        final String name;
+        Token(String name) {
+            this.name = name;
+        }
 
         @Override
         public String toString() {
@@ -114,7 +122,7 @@ public class Nested {
             case -1: return Token.EOF;
             case '(': return token(Token.LP);
             case ')': return token(Token.RP);
-            case ';': return token(Token.SEMI);
+            case ';': return token(Token.SEMICOLON);
             case ',': return token(Token.COMMA);
             case '+': return token(Token.PLUS);
             case '-': return token(Token.MINUS);
@@ -208,7 +216,7 @@ public class Nested {
         var();
         while (eat(Token.COMMA))
             var();
-        expect(Token.SEMI);
+        expect(Token.SEMICOLON);
     }
 
     void routines() {
@@ -254,9 +262,9 @@ public class Nested {
 
     void statements() {
         statement();
-        while (eat(Token.SEMI))
+        while (eat(Token.SEMICOLON))
             statement();
-        if (eat(Token.SEMI))
+        if (eat(Token.SEMICOLON))
             ;
     }
 
@@ -268,7 +276,6 @@ public class Nested {
         if (eat(Token.PROCEDURE, Token.FUNCTION))
             routines();
         statements();
-        expect(Token.END);
     }
 
     public static List<Instruction> parse(String input) {

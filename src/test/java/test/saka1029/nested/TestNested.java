@@ -61,7 +61,12 @@ public class TestNested {
     @Test
     public void testParse() {
         List<Instruction> code = Nested.parse(
-                    "program var x=3; procedure f(y) x=2 end x=5 end");
+            """
+            program
+            var x = 3, y = 5;
+            procedure f(a) x = 2 + a end
+            y = 5 * x
+            """);
         assertEquals(0, code.size());
 
     }

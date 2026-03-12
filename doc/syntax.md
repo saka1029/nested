@@ -1,7 +1,7 @@
 # Syntax
 
 ```
-program    = 'program' [ vars ] [ routines ] statements 'end'
+program    = 'program' [ vars ] [ routines ] statements
 vars       = 'var' var { ',' var } ';'
 var        = id [ '=' expression ]
 routines   = routine { ';' routine } [ ';' ]

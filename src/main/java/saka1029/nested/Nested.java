@@ -297,6 +297,7 @@ public class Nested {
         if (eat(Token.PROCEDURE, Token.FUNCTION))
             routines();
         statements();
+        must(Token.END);
     }
 
     public static List<Instruction> parse(String input) {

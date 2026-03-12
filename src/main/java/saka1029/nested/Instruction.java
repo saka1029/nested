@@ -16,33 +16,33 @@ public interface Instruction {
     public static final Instruction GT = c -> c.push(c.pop() < c.pop() ? 1:0);
     public static final Instruction GE = c -> c.push(c.pop() <= c.pop() ? 1:0);
 
-    static class Literal implements Instruction {
-        final int literal;
-        Literal(int literal) { this.literal = literal; }
-        @Override public boolean equals(Object obj) { return obj instanceof Literal x && x.literal == literal; }
-        @Override public void execute(Context context) { context.push(literal); }
-    }
-    public static Instruction literal(int literal) {
-        return new Literal(literal);
-    }
-
-    static class Load implements Instruction {
-        final int address;
-        Load(int address) { this.address = address; }
-        @Override public boolean equals(Object obj) { return obj instanceof Load x && x.address == address; }
-        @Override public void execute(Context context) { context.push(context.stack[address]); }
-    }
-    public static Instruction load(int address) {
-        return new Load(address);
+    static abstract class InstAbs implements Instruction {
+        final int value;
+        InstAbs(int value) { this.value = value; }
+        @Override
+        public boolean equals(Object obj) {
+            return obj != null
+                && obj.getClass() == getClass()
+                && obj instanceof InstAbs ia
+                && ia.value == value;
+        }
     }
 
-    static class Store implements Instruction {
-        final int address;
-        Store(int address) { this.address = address; }
-        @Override public boolean equals(Object obj) { return obj instanceof Store x && x.address == address; }
-        @Override public void execute(Context context) { context.stack[address] = context.pop(); }
+    static class Literal extends InstAbs {
+        Literal(int value) { super(value); }
+        @Override public void execute(Context context) { context.push(value); }
     }
-    public static Instruction store(int address) {
-        return new Store(address);
+    public static Instruction literal(int literal) { return new Literal(literal); }
+
+    static class Load extends InstAbs {
+        Load(int value) { super(value); }
+        @Override public void execute(Context context) { context.push(context.stack[value]); }
     }
+    public static Instruction load(int address) { return new Load(address); }
+
+    static class Store extends InstAbs {
+        Store(int value) { super(value); }
+        @Override public void execute(Context context) { context.stack[value] = context.pop(); }
+    }
+    public static Instruction store(int address) { return new Store(address); }
 }

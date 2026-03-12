@@ -68,7 +68,18 @@ public class TestNested {
                 x = x + 3;
             end
             """);
-        assertEquals(0, code.size());
-
+        assertEquals(10, code.size());
+        List<Instruction> expectedCode = List.of(
+            Instruction.literal(3),
+            Instruction.literal(5),
+            Instruction.literal(5),
+            Instruction.load(0),
+            Instruction.MULTIPLY,
+            Instruction.store(1),
+            Instruction.load(0),
+            Instruction.literal(3),
+            Instruction.ADD,
+            Instruction.store(0));
+        assertEquals(expectedCode, code);
     }
 }

@@ -5,6 +5,7 @@ import java.util.Map;
 import static java.util.Map.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class Nested {
@@ -14,7 +15,7 @@ public class Nested {
         PLUS("+"), MINUS("-"), STAR("*"), SLASH("/"),
         ASSIGN("="), EQ("=="), NOT("!"), NE("!="),
         GT(">"), GE(">="), LT("<"), LE("<="),
-        AND("&&"), OR("||"),
+        AND("&"), OR("|"),
         PROGRAM("program"), VAR("var"), END("end"),
         PROCEDURE("procedure"), FUNCTION("function"),
         IF("if"), THEN("then"), ELSE("else"),
@@ -53,6 +54,9 @@ public class Nested {
     // eatenStringはeatenがIDまたはINTのときのみ値が保証される。
     public Token eaten;
     public String eatenString;
+
+    List<Instruction> codes = new ArrayList<>();
+    Map<String, Integer> variables = new LinkedHashMap<>();
 
     public Nested(String input) {
         this.input = input.codePoints().toArray();
@@ -136,8 +140,8 @@ public class Nested {
             case '<': return token(Token.LT, '=', Token.LE);
             case '>': return token(Token.GT, '=', Token.GE);
             case '!': return token(Token.NOT, '=', Token.NE);
-            case '&': return token('&', Token.AND);
-            case '|': return token('|', Token.OR);
+            case '&': return token(Token.AND);
+            case '|': return token(Token.OR);
             default:
                 if (isIdFirst(ch))
                     return id();
@@ -167,8 +171,6 @@ public class Nested {
         token();
     }
 
-    List<Instruction> codes = new ArrayList<>();
-
     RuntimeException error(String format, Object... args) {
         return new RuntimeException(format.formatted(args));
     }
@@ -178,9 +180,14 @@ public class Nested {
             expression();
             must(Token.RP);
         } else if (eat(Token.ID)) {
-            ;
+            String name = eatenString;
+            Integer addr = variables.get(name);
+            if (addr == null)
+                throw error("Variable '%s' not defined", name);
+            codes.add(Instruction.load(addr));
         } else if (eat(Token.INT)) {
-            ;
+            int value = Integer.parseInt(eatenString);
+            codes.add(Instruction.literal(value));
         } else
             throw error("Unknown token '%s'", token);
     }
@@ -188,25 +195,34 @@ public class Nested {
     void term() {
         factor();
         while (true) {
-            if (eat(Token.STAR))
+            if (eat(Token.STAR)) {
                 factor();
-            else if (eat(Token.SLASH))
+                codes.add(Instruction.MULTIPLY);
+            } else if (eat(Token.SLASH)) {
                 factor();
-            else
+                codes.add(Instruction.DIVIDE);
+            } else
                 break;
         }
     }
 
     void expression() {
-        if (eat(Token.PLUS, Token.MINUS))
-            ;
+        boolean minus = false;
+        if (eat(Token.PLUS))
+            /* do nothing */;
+        else if(eat(Token.MINUS))
+            minus = true;
         term();
+        if (minus)
+            codes.add(Instruction.NEGATE);
         while (true) {
-            if (eat(Token.PLUS))
+            if (eat(Token.PLUS)) {
                 term();
-            else if (eat(Token.MINUS))
+                codes.add(Instruction.ADD);
+            } else if (eat(Token.MINUS)) {
                 term();
-            else
+                codes.add(Instruction.SUBTRACT);
+            } else
                 break;
         }
     }
@@ -214,9 +230,12 @@ public class Nested {
     void var() {
         // Token.VARがeatされた状態
         must(Token.ID);
-        System.out.printf("var %s%n", eatenString);
+        String name = eatenString;
         if (eat(Token.ASSIGN))
             expression();
+        else
+            codes.add(Instruction.literal(0));
+        variables.put(name, variables.size());
     }
 
     void vars() {
@@ -228,18 +247,11 @@ public class Nested {
 
     void routines() {
         // procedureまたはfunctionがeatされている
-        Token t = eaten;
         must(Token.ID);
-        // IDがeatされている
-        System.out.printf("%s %s%n", t, eatenString);
         must(Token.LP);
         if (eat(Token.ID)) {
-            // IDがeatされている
-            System.out.printf("arg %s%n", eatenString);
             while (eat(Token.COMMA)) {
                 must(Token.ID);
-                // IDがeatされている
-                System.out.printf("arg %s%n", eatenString);
             }
         }
         must(Token.RP);
@@ -251,8 +263,13 @@ public class Nested {
 
     void statement() {
         if (eat(Token.ID)) {
+            String name = eatenString;
             if (eat(Token.ASSIGN)) {
                 expression();
+                Integer addr = variables.get(name);
+                if (addr == null)
+                    throw error("Variable '%s' not defined", name);
+                codes.add(Instruction.store(addr));
             } else if (eat(Token.LP)) {
                 if (!eat(Token.RP)) {
                     expression();

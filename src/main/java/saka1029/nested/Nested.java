@@ -220,6 +220,7 @@ public class Nested {
     }
 
     void routines() {
+        System.out.printf("%s %s%n", eatenString, string);
         expect(Token.ID);
         expect(Token.LP);
         if (eat(Token.ID))

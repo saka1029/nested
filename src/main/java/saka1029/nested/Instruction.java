@@ -10,6 +10,7 @@ public interface Instruction {
     public static final Instruction MULTIPLY = c -> c.push(c.pop() * c.pop());
     public static final Instruction DIVIDE = c -> { int r=c.pop(); c.push(c.pop() / r); };
     public static final Instruction NEGATE = c -> c.push(-c.pop());
+    public static final Instruction DISPLAY = c -> System.out.println(c.pop());
     public static final Instruction EQ = c -> c.push(c.pop() == c.pop() ? 1:0);
     public static final Instruction NE = c -> c.push(c.pop() != c.pop() ? 1:0);
     public static final Instruction LT = c -> c.push(c.pop() > c.pop() ? 1:0);

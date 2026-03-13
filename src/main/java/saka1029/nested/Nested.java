@@ -20,6 +20,7 @@ public class Nested {
         PROCEDURE("procedure"), FUNCTION("function"),
         IF("if"), THEN("then"), ELSE("else"),
         WHILE("while"), DO("do"), RETURN("return"),
+        DISPLAY("display"),
         INT("INTEGER"), ID("IDENTifier"), EOF("EOF");
 
         final String name;
@@ -39,6 +40,7 @@ public class Nested {
         entry("procedure", Token.PROCEDURE), entry("function", Token.FUNCTION),
         entry("if", Token.IF), entry("then", Token.THEN), entry("else", Token.ELSE),
         entry("while", Token.WHILE), entry("do", Token.DO),
+        entry("display", Token.DISPLAY),
         entry("return", Token.RETURN)
     );
 
@@ -294,10 +296,15 @@ public class Nested {
      * X:                BF Y              B X  Y:
      */
     void whileStatement() {
+        int whilePos = codes.size();
         expression();
         must(Token.DO);
+        int doPos = codes.size();
+        codes.add(Instruction.branchFalse(-1));
         statements();
         must(Token.END);
+        codes.add(Instruction.branch(whilePos));
+        codes.set(doPos, Instruction.branchFalse(codes.size()));
     }
 
     void assignOrCallStatement() {
@@ -318,6 +325,11 @@ public class Nested {
         }
     }
 
+    void displayStatement() {
+        expression();
+        codes.add(Instruction.DISPLAY);
+    }
+
     void statement() {
         if (eat(Token.ID))
             assignOrCallStatement();
@@ -325,6 +337,8 @@ public class Nested {
             ifStatement();
         else if (eat(Token.WHILE))
             whileStatement();
+        else if (eat(Token.DISPLAY))
+            displayStatement();
     }
 
     void statements() {

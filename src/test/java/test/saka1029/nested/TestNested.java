@@ -139,6 +139,61 @@ public class TestNested {
     }
 
     @Test
+    public void testWhileDo() {
+        Context context = Nested.parse(
+            """
+            program
+                var x = 2;
+                while x do
+                    x = x - 1
+                end
+            end
+            """);
+        List<Instruction> expectedCodes = List.of(
+            Instruction.literal(2),
+            Instruction.load(0),
+            Instruction.branchFalse(8),
+            Instruction.load(0),
+            Instruction.literal(1),
+            Instruction.SUBTRACT,
+            Instruction.store(0),
+            Instruction.branch(1),
+            Instruction.NOP);
+        assertEquals(expectedCodes.size(), context.codes.size());
+        assertEquals(expectedCodes, context.codes);
+        context.run();
+        assertEquals(0, context.get("x"));
+    }
+
+    @Test
+    public void testDisplay() {
+        Context context = Nested.parse(
+            """
+            program
+                var x = 2;
+                display x;
+                x = x - 1;
+                display x;
+            end
+            """);
+        List<Instruction> expectedCodes = List.of(
+            Instruction.literal(2),
+            Instruction.load(0),
+            Instruction.DISPLAY,
+            Instruction.load(0),
+            Instruction.literal(1),
+            Instruction.SUBTRACT,
+            Instruction.store(0),
+            Instruction.load(0),
+            Instruction.DISPLAY,
+            Instruction.NOP);
+        assertEquals(expectedCodes.size(), context.codes.size());
+        assertEquals(expectedCodes, context.codes);
+        context.run();
+        assertEquals(1, context.get("x"));
+    }
+
+    @Test
     public void testRun() {
         String source = """
             program

@@ -60,7 +60,7 @@ public class Nested {
     public String eatenString;
 
     List<Instruction> codes = new ArrayList<>();
-    Map<String, Integer> variables = new LinkedHashMap<>();
+    Map<String, Reference> references = new LinkedHashMap<>();
 
     public Nested(String input) {
         this.input = input.codePoints().toArray();
@@ -185,10 +185,10 @@ public class Nested {
             must(Token.RP);
         } else if (eat(Token.ID)) {
             String name = eatenString;
-            Integer addr = variables.get(name);
-            if (addr == null)
+            Reference ref = references.get(name);
+            if (ref == null)
                 throw error("Variable '%s' not defined", name);
-            codes.add(Instruction.load(addr));
+            codes.add(Instruction.load(ref.address));
         } else if (eat(Token.INT)) {
             int value = Integer.parseInt(eatenString);
             codes.add(Instruction.literal(value));
@@ -239,9 +239,9 @@ public class Nested {
             expression();
         else
             codes.add(Instruction.literal(0));
-        if (variables.containsKey(name))
+        if (references.containsKey(name))
             throw error("Variale '%s' duplicated", name);
-        variables.put(name, variables.size());
+        references.put(name, new Reference(references.size()));
     }
 
     void vars() {
@@ -255,10 +255,10 @@ public class Nested {
         String name = eatenString;
         must(Token.ASSIGN);
         expression();
-        Integer addr = variables.get(name);
-        if (addr == null)
+        Reference ref = references.get(name);
+        if (ref == null)
             throw error("Variable '%s' not defined", name);
-        codes.add(Instruction.store(addr));
+        codes.add(Instruction.store(ref.address));
         must(Token.SEMICOLON);
     }
 
@@ -337,7 +337,7 @@ public class Nested {
         Nested nested = new Nested(input);
         nested.token();
         nested.program();
-        return new Context(nested.codes, nested.variables);
+        return new Context(nested.codes, nested.references);
     }
 
 }

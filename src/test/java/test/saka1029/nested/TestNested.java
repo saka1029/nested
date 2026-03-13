@@ -207,11 +207,11 @@ public class TestNested {
         assertEquals(2, context.sp);
         // var x
         assertEquals(6, context.stack[0]);
-        assertEquals(0, (int)context.variables.get("x"));
+        assertEquals(0, (int)context.references.get("x").address);
         assertEquals(6, context.get("x"));
         // var y
         assertEquals(15, context.stack[1]);
-        assertEquals(1, (int)context.variables.get("y"));
+        assertEquals(1, (int)context.references.get("y").address);
         assertEquals(15, context.get("y"));
     }
 }

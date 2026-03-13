@@ -11,11 +11,11 @@ public class Context {
     public int sp = 0;
     public int pc = 0;
     public final List<Instruction> codes;
-    public final Map<String, Integer> variables;
+    public final Map<String, Reference> references;
 
-    public Context(List<Instruction> codes, Map<String, Integer> variables) {
+    public Context(List<Instruction> codes, Map<String, Reference> references) {
         this.codes = codes;
-        this.variables = variables;
+        this.references = references;
     }
 
     public Context() {
@@ -34,7 +34,10 @@ public class Context {
     }
 
     public int get(String variable) {
-        return stack[variables.get(variable)];
+        Reference ref = references.get(variable);
+        if (ref == null)
+            throw new RuntimeException("Variable '%s' not defined".formatted(variable));
+        return stack[ref.address];
     }
 
     public void nop() {

@@ -239,9 +239,10 @@ public class Nested {
             expression();
         else
             codes.add(Instruction.literal(0));
-        if (references.containsKey(name))
-            throw error("Variale '%s' duplicated", name);
-        references.put(name, new Reference(references.size()));
+        Reference ref = references.get(name);
+        if (ref != null)
+            throw error("Global name '%s' is duplicated", name);
+        references.put(name, new Global(references.size()));
     }
 
     void vars() {
@@ -256,7 +257,7 @@ public class Nested {
         must(Token.ASSIGN);
         expression();
         Reference ref = references.get(name);
-        if (ref == null)
+        if (!(ref instanceof Global))
             throw error("Variable '%s' not defined", name);
         codes.add(Instruction.store(ref.address));
         must(Token.SEMICOLON);

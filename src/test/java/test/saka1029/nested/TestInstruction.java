@@ -21,9 +21,9 @@ public class TestInstruction {
     }
 
     @Test
-    public void testLoad() {
+    public void testLoadGlobal() {
         Context context = new Context();
-        context.codes.add(Instruction.load(0));
+        context.codes.add(Instruction.loadGlobal(0));
         context.push(22);   // address = 0
         assertEquals(1, context.sp);
         assertEquals(22, context.stack[0]);
@@ -35,9 +35,9 @@ public class TestInstruction {
     }
 
     @Test
-    public void testStore() {
+    public void testStoreGlobal() {
         Context context = new Context();
-        context.codes.add(Instruction.store(0));
+        context.codes.add(Instruction.storeGlobal(0));
         context.push(22);   // address = 0
         context.push(77);
         assertEquals(2, context.sp);

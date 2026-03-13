@@ -74,13 +74,13 @@ public class TestNested {
             Instruction.literal(3),
             Instruction.literal(5),
             Instruction.literal(5),
-            Instruction.load(0),
+            Instruction.loadGlobal(0),
             Instruction.MULTIPLY,
-            Instruction.store(1),
-            Instruction.load(0),
+            Instruction.storeGlobal(1),
+            Instruction.loadGlobal(0),
             Instruction.literal(3),
             Instruction.ADD,
-            Instruction.store(0),
+            Instruction.storeGlobal(0),
             Instruction.NOP);
         assertEquals(expectedCodes, context.codes);
     }
@@ -104,10 +104,10 @@ public class TestNested {
             Instruction.literal(0),
             Instruction.branchFalse(6),
             Instruction.literal(0),
-            Instruction.store(0),
+            Instruction.storeGlobal(0),
             Instruction.branch(8),
             Instruction.literal(5),
-            Instruction.store(0),
+            Instruction.storeGlobal(0),
             Instruction.NOP);
         assertEquals(expectedCodes, context.codes);
         context.run();
@@ -131,7 +131,7 @@ public class TestNested {
             Instruction.literal(1),
             Instruction.branchFalse(5),
             Instruction.literal(0),
-            Instruction.store(0),
+            Instruction.storeGlobal(0),
             Instruction.NOP);
         assertEquals(expectedCodes, context.codes);
         context.run();
@@ -151,12 +151,12 @@ public class TestNested {
             """);
         List<Instruction> expectedCodes = List.of(
             Instruction.literal(2),
-            Instruction.load(0),
+            Instruction.loadGlobal(0),
             Instruction.branchFalse(8),
-            Instruction.load(0),
+            Instruction.loadGlobal(0),
             Instruction.literal(1),
             Instruction.SUBTRACT,
-            Instruction.store(0),
+            Instruction.storeGlobal(0),
             Instruction.branch(1),
             Instruction.NOP);
         assertEquals(expectedCodes.size(), context.codes.size());
@@ -178,13 +178,13 @@ public class TestNested {
             """);
         List<Instruction> expectedCodes = List.of(
             Instruction.literal(2),
-            Instruction.load(0),
+            Instruction.loadGlobal(0),
             Instruction.DISPLAY,
-            Instruction.load(0),
+            Instruction.loadGlobal(0),
             Instruction.literal(1),
             Instruction.SUBTRACT,
-            Instruction.store(0),
-            Instruction.load(0),
+            Instruction.storeGlobal(0),
+            Instruction.loadGlobal(0),
             Instruction.DISPLAY,
             Instruction.NOP);
         assertEquals(expectedCodes.size(), context.codes.size());

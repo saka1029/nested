@@ -17,7 +17,7 @@ public class Nested {
         GT(">"), GE(">="), LT("<"), LE("<="),
         AND("&"), OR("|"),
         PROGRAM("program"), VAR("var"), END("end"),
-        PROCEDURE("procedure"), FUNCTION("function"),
+        PROC("proc"), FUNC("func"),
         IF("if"), THEN("then"), ELSE("else"),
         WHILE("while"), DO("do"), RETURN("return"),
         DISPLAY("display"),
@@ -37,7 +37,7 @@ public class Nested {
     static final Map<String, Token> RESERVED = Map.ofEntries(
         entry("program", Token.PROGRAM),
         entry("var", Token.VAR), entry("end", Token.END),
-        entry("procedure", Token.PROCEDURE), entry("function", Token.FUNCTION),
+        entry("proc", Token.PROC), entry("func", Token.FUNC),
         entry("if", Token.IF), entry("then", Token.THEN), entry("else", Token.ELSE),
         entry("while", Token.WHILE), entry("do", Token.DO),
         entry("display", Token.DISPLAY),
@@ -311,6 +311,50 @@ public class Nested {
         must(Token.SEMICOLON);
     }
 
+    void args() {
+        must(Token.LP);
+        if (eat(Token.ID)) {
+            while (eat(Token.COMMA)) {
+                must(Token.ID);
+            }
+        }
+        must(Token.RP);
+    }
+
+    void routineVar() {
+        // Token.VARがeatされた状態
+        must(Token.ID);
+        // String name = eatenString;
+        if (eat(Token.ASSIGN))
+            expression();
+        else
+            codes.add(Instruction.literal(0)); // 式がない場合の初期値=0
+    }
+
+    void routineVars() {
+        routineVar();
+        while (eat(Token.COMMA))
+            routineVar();
+        must(Token.SEMICOLON);
+    }
+
+    void routine() {
+        must(Token.ID);
+        args();
+        if (eat(Token.VAR))
+            routineVars();
+        statements();
+        must(Token.END);
+    }
+
+    void procStatement() {
+        routine();
+    }
+
+    void funcStatement() {
+        routine();
+    }
+
     void statements() {
         while (true)
             if (eat(Token.ID))
@@ -321,6 +365,10 @@ public class Nested {
                 whileStatement();
             else if(eat(Token.DISPLAY))
                 displayStatement();
+            else if(eat(Token.PROC))
+                procStatement();
+            else if(eat(Token.FUNC))
+                funcStatement();
             else
                 break;
     }

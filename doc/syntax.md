@@ -9,4 +9,8 @@ statement  = id '=' expression ';'
            | 'if' expression 'then' statements [ 'else' statements ] 'end'
            | 'while' expression 'do' statements 'end'
            | 'display' expression ';'
+           | 'proc' routine
+           | 'func' routine
+routine    = id args [ vars ] statements 'end'
+args       = '(' [ id { ',' id } ] ')'
 ```

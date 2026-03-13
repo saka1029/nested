@@ -188,7 +188,7 @@ public class Nested {
             Reference ref = references.get(name);
             if (ref == null)
                 throw error("Variable '%s' not defined", name);
-            codes.add(Instruction.load(ref.address));
+            codes.add(Instruction.loadGlobal(ref.address));
         } else if (eat(Token.INT)) {
             int value = Integer.parseInt(eatenString);
             codes.add(Instruction.literal(value));
@@ -238,7 +238,7 @@ public class Nested {
         if (eat(Token.ASSIGN))
             expression();
         else
-            codes.add(Instruction.literal(0));
+            codes.add(Instruction.literal(0)); // 式がない場合の初期値=0
         Reference ref = references.get(name);
         if (ref != null)
             throw error("Global name '%s' is duplicated", name);
@@ -259,7 +259,7 @@ public class Nested {
         Reference ref = references.get(name);
         if (!(ref instanceof Global))
             throw error("Variable '%s' not defined", name);
-        codes.add(Instruction.store(ref.address));
+        codes.add(Instruction.storeGlobal(ref.address));
         must(Token.SEMICOLON);
     }
 

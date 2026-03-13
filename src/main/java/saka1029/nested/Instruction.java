@@ -36,17 +36,17 @@ public interface Instruction {
     }
     public static Instruction literal(int literal) { return new Literal(literal); }
 
-    static class Load extends InstAbs {
-        Load(int value) { super(value); }
+    static class LoadGlobal extends InstAbs {
+        LoadGlobal(int value) { super(value); }
         @Override public void execute(Context context) { context.push(context.stack[value]); }
     }
-    public static Instruction load(int address) { return new Load(address); }
+    public static Instruction loadGlobal(int address) { return new LoadGlobal(address); }
 
-    static class Store extends InstAbs {
-        Store(int value) { super(value); }
+    static class StoreGlobal extends InstAbs {
+        StoreGlobal(int value) { super(value); }
         @Override public void execute(Context context) { context.stack[value] = context.pop(); }
     }
-    public static Instruction store(int address) { return new Store(address); }
+    public static Instruction storeGlobal(int address) { return new StoreGlobal(address); }
 
     static class Branch extends InstAbs {
         Branch(int value) { super(value); }

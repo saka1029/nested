@@ -30,7 +30,7 @@ public class Nested {
 
         @Override
         public String toString() {
-            return name().toLowerCase();
+            return name;
         }
     }
 
@@ -249,20 +249,15 @@ public class Nested {
         must(Token.SEMICOLON);
     }
 
-    void routines() {
-        // procedureまたはfunctionがeatされている
-        must(Token.ID);
-        must(Token.LP);
-        if (eat(Token.ID)) {
-            while (eat(Token.COMMA)) {
-                must(Token.ID);
-            }
-        }
-        must(Token.RP);
-        if (eat(Token.VAR))
-            vars();
-        statements();
-        must(Token.END);
+    void assignStatement() {
+        String name = eatenString;
+        must(Token.ASSIGN);
+        expression();
+        Integer addr = variables.get(name);
+        if (addr == null)
+            throw error("Variable '%s' not defined", name);
+        codes.add(Instruction.store(addr));
+        must(Token.SEMICOLON);
     }
 
     /**
@@ -307,54 +302,30 @@ public class Nested {
         codes.set(doPos, Instruction.branchFalse(codes.size()));
     }
 
-    void assignOrCallStatement() {
-        String name = eatenString;
-        if (eat(Token.ASSIGN)) {
-            expression();
-            Integer addr = variables.get(name);
-            if (addr == null)
-                throw error("Variable '%s' not defined", name);
-            codes.add(Instruction.store(addr));
-        } else if (eat(Token.LP)) {
-            if (!eat(Token.RP)) {
-                expression();
-                while (eat(Token.COMMA))
-                    expression();
-            }
-            must(Token.RP);
-        }
-    }
-
     void displayStatement() {
         expression();
         codes.add(Instruction.DISPLAY);
-    }
-
-    void statement() {
-        if (eat(Token.ID))
-            assignOrCallStatement();
-        else if (eat(Token.IF))
-            ifStatement();
-        else if (eat(Token.WHILE))
-            whileStatement();
-        else if (eat(Token.DISPLAY))
-            displayStatement();
+        must(Token.SEMICOLON);
     }
 
     void statements() {
-        statement();
-        while (eat(Token.SEMICOLON))
-            statement();
-        eat(Token.SEMICOLON);
+        while (true)
+            if (eat(Token.ID))
+                assignStatement();
+            else if(eat(Token.IF))
+                ifStatement();
+            else if(eat(Token.WHILE))
+                whileStatement();
+            else if(eat(Token.DISPLAY))
+                displayStatement();
+            else
+                break;
     }
 
     void program() {
-        token();
         must(Token.PROGRAM);
         if (eat(Token.VAR))
             vars();
-        // if (eat(Token.PROCEDURE, Token.FUNCTION))
-        //     routines();
         statements();
         must(Token.END);
         codes.add(Instruction.NOP);
@@ -362,6 +333,7 @@ public class Nested {
 
     public static Context parse(String input) {
         Nested nested = new Nested(input);
+        nested.token();
         nested.program();
         return new Context(nested.codes, nested.variables);
     }

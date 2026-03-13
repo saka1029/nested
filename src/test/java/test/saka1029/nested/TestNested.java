@@ -92,9 +92,9 @@ public class TestNested {
             program
                 var x = 2;
                 if 0 then
-                    x = 0
+                    x = 0;
                 else
-                    x = 5
+                    x = 5;
                 end
             end
             """);
@@ -121,7 +121,7 @@ public class TestNested {
             program
                 var x = 2;
                 if 1 then
-                    x = 0
+                    x = 0;
                 end
             end
             """);
@@ -145,7 +145,7 @@ public class TestNested {
             program
                 var x = 2;
                 while x do
-                    x = x - 1
+                    x = x - 1;
                 end
             end
             """);

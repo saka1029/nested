@@ -44,6 +44,8 @@ public class Nested {
         entry("return", Token.RETURN)
     );
 
+    static final int DUMMY = Integer.MIN_VALUE;
+
     final int[] input;
     int index = 0, ch;
 
@@ -270,13 +272,13 @@ public class Nested {
         expression();
         must(Token.THEN);
         int thenPos = codes.size();
-        codes.add(Instruction.branchFalse(-1));
+        codes.add(Instruction.branchFalse(DUMMY));
         statements();
         boolean elseExists = false;
         if (eat(Token.ELSE)) {
             elseExists = true;
             int elsePos = codes.size();
-            codes.add(Instruction.branch(-1));
+            codes.add(Instruction.branch(DUMMY));
             codes.set(thenPos, Instruction.branchFalse(codes.size()));
             statements();
             codes.set(elsePos, Instruction.branch(codes.size()));
@@ -295,7 +297,7 @@ public class Nested {
         expression();
         must(Token.DO);
         int doPos = codes.size();
-        codes.add(Instruction.branchFalse(-1));
+        codes.add(Instruction.branchFalse(DUMMY));
         statements();
         must(Token.END);
         codes.add(Instruction.branch(whilePos));

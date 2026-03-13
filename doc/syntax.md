@@ -8,4 +8,5 @@ statements = { statement }
 statement  = id '=' expression ';'
            | 'if' expression 'then' statements [ 'else' statements ] 'end'
            | 'while' expression 'do' statements 'end'
+           | 'display' expression ';'
 ```

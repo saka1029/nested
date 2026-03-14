@@ -220,7 +220,7 @@ public class TestNested {
         String source = """
             program
                 var x = 3;
-                proc f(a, b) var s = 3; x = 5; end
+                proc f(a, b) var s = 3; s = 5; end
                 x = 4;
             end
             """;
@@ -231,7 +231,7 @@ public class TestNested {
             Instruction.branch(5),
             Instruction.literal(3),
             Instruction.literal(5),
-            Instruction.storeGlobal(0),
+            Instruction.storeLocal(2),
             Instruction.literal(4),
             Instruction.storeGlobal(0),
             Instruction.NOP);

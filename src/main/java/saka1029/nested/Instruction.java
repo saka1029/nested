@@ -42,11 +42,23 @@ public interface Instruction {
     }
     public static Instruction loadGlobal(int address) { return new LoadGlobal(address); }
 
+    static class LoadLocal extends InstAbs {
+        LoadLocal(int value) { super(value); }
+        @Override public void execute(Context context) { context.push(context.stack[value]); }
+    }
+    public static Instruction loadLocal(int address) { return new LoadLocal(address); }
+
     static class StoreGlobal extends InstAbs {
         StoreGlobal(int value) { super(value); }
         @Override public void execute(Context context) { context.stack[value] = context.pop(); }
     }
     public static Instruction storeGlobal(int address) { return new StoreGlobal(address); }
+
+    static class StoreLocal extends InstAbs {
+        StoreLocal(int value) { super(value); }
+        @Override public void execute(Context context) { context.stack[value] = context.pop(); }
+    }
+    public static Instruction storeLocal(int address) { return new StoreLocal(address); }
 
     static class Branch extends InstAbs {
         Branch(int value) { super(value); }

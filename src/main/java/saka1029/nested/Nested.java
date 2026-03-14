@@ -61,6 +61,7 @@ public class Nested {
 
     List<Instruction> codes = new ArrayList<>();
     Map<String, Reference> references = new LinkedHashMap<>();
+    Routine routine;
 
     public Nested(String input) {
         this.input = input.codePoints().toArray();
@@ -186,9 +187,15 @@ public class Nested {
         } else if (eat(Token.ID)) {
             String name = eatenString;
             Reference ref = references.get(name);
-            if (ref == null)
-                throw error("Variable '%s' not defined", name);
-            codes.add(Instruction.loadGlobal(ref.address));
+            if (ref != null)
+                codes.add(Instruction.loadGlobal(ref.address));
+            else if (this.routine != null) {
+                Local local = this.routine.variables.get(name);
+                if (local != null)
+                    codes.add(Instruction.loadLocal(local.address));
+                else
+                    throw error("Variable '%s' not defined", name);
+            }
         } else if (eat(Token.INT)) {
             int value = Integer.parseInt(eatenString);
             codes.add(Instruction.literal(value));
@@ -257,9 +264,15 @@ public class Nested {
         must(Token.ASSIGN);
         expression();
         Reference ref = references.get(name);
-        if (!(ref instanceof Global))
-            throw error("Variable '%s' not defined", name);
-        codes.add(Instruction.storeGlobal(ref.address));
+        if (ref instanceof Global)
+            codes.add(Instruction.storeGlobal(ref.address));
+        else if (this.routine != null) {
+            Local local = this.routine.variables.get(name);
+            if (local != null)
+                codes.add(Instruction.storeLocal(local.address));
+            else
+                throw error("Variable '%s' not defined", name);
+        }
         must(Token.SEMICOLON);
     }
 
@@ -361,7 +374,9 @@ public class Nested {
         args(routine);
         if (eat(Token.VAR))
             vars(routine);
+        this.routine = routine;
         statements();
+        this.routine = null;
         must(Token.END);
         // 常にproc, func本体はスキップする。
         codes.set(start, Instruction.branch(codes.size()));

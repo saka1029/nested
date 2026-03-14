@@ -226,6 +226,20 @@ public class TestNested {
             """;
         Context context = Nested.parse(source);
         System.out.println(context.references);
-
+        List<Instruction> expectedCodes = List.of(
+            Instruction.literal(3),
+            Instruction.branch(5),
+            Instruction.literal(3),
+            Instruction.literal(5),
+            Instruction.storeGlobal(0),
+            Instruction.literal(4),
+            Instruction.storeGlobal(0),
+            Instruction.NOP);
+        assertEquals(expectedCodes.size(), context.codes.size());
+        for (int i = 0; i < expectedCodes.size(); ++i) {
+            System.out.println("compare " + i);
+            assertEquals(expectedCodes.get(i), context.codes.get(i));
+        }
+        assertEquals(expectedCodes, context.codes);
     }
 }

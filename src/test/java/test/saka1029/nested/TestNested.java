@@ -214,4 +214,18 @@ public class TestNested {
         assertEquals(1, (int)context.references.get("y").address);
         assertEquals(15, context.get("y"));
     }
+
+    @Test
+    public void testProc() {
+        String source = """
+            program
+                var x = 3;
+                proc f(a, b) var s = 3; x = 5; end
+                x = 4;
+            end
+            """;
+        Context context = Nested.parse(source);
+        System.out.println(context.references);
+
+    }
 }

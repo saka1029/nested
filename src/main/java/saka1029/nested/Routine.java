@@ -11,4 +11,8 @@ public class Routine extends Reference {
         super(address);
     }
 
+    @Override
+    public String toString() {
+        return "Routine(addr=%d, vars=%s)".formatted(address, variables);
+    }
 }

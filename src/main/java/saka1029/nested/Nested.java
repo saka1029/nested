@@ -311,40 +311,60 @@ public class Nested {
         must(Token.SEMICOLON);
     }
 
-    void args() {
+    void arg(Routine routine, String name) {
+        Local local = routine.variables.get(name);
+        if (local != null)
+            throw error("Variable '%s' duplicated", name);
+        routine.variables.put(name, new Local(routine.variables.size()));
+    }
+
+    void args(Routine routine) {
         must(Token.LP);
         if (eat(Token.ID)) {
+            arg(routine, eatenString);
             while (eat(Token.COMMA)) {
                 must(Token.ID);
+                arg(routine, eatenString);
             }
         }
         must(Token.RP);
     }
 
-    void routineVar() {
+    void var(Routine routine) {
         // Token.VARがeatされた状態
         must(Token.ID);
-        // String name = eatenString;
+        String name = eatenString;
         if (eat(Token.ASSIGN))
             expression();
         else
             codes.add(Instruction.literal(0)); // 式がない場合の初期値=0
+        Local local = routine.variables.get(name);
+        if (local != null)
+            throw error("Local variable name '%s' is duplicated", name);
+        routine.variables.put(name, new Local(routine.variables.size()));
     }
 
-    void routineVars() {
-        routineVar();
+    void vars(Routine routine) {
+        var(routine);
         while (eat(Token.COMMA))
-            routineVar();
+            var(routine);
         must(Token.SEMICOLON);
     }
 
     void routine() {
+        int start = codes.size();
+        codes.add(Instruction.branch(DUMMY));
         must(Token.ID);
-        args();
+        String name = eatenString;
+        Routine routine = new Routine(codes.size());
+        references.put(name, routine);
+        args(routine);
         if (eat(Token.VAR))
-            routineVars();
+            vars(routine);
         statements();
         must(Token.END);
+        // 常にproc, func本体はスキップする。
+        codes.set(start, Instruction.branch(codes.size()));
     }
 
     void procStatement() {

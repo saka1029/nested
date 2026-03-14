@@ -19,4 +19,9 @@ public class Reference {
         this.address = address;
     }
 
+    @Override
+    public String toString() {
+        return "%s(addr=%d)".formatted(getClass().getSimpleName(), address);
+    }
+
 }
